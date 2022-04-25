@@ -11,6 +11,8 @@
                 <v-col cols="12">
                     <h2>Breakfasts</h2>
                 </v-col>
+            </v-row>
+            <v-row no-gutters>
                 <v-col cols="12">
                     <v-slide-group multiple v-model="model">
                         <v-slide-item
@@ -18,8 +20,8 @@
                             :key="n"
                             v-slot="{ active, toggle }"
                         >
-                            <v-col cols="1">
-                                <v-card class="" rounded="lg" elevation="0">
+                            <v-col>
+                                <v-card width="140" rounded="lg" elevation="0">
                                     <v-img
                                         src="../assets/2681826 1.png"
                                         class="rounded-lg"
@@ -52,6 +54,8 @@
                 <v-col cols="12">
                     <h2>Diners</h2>
                 </v-col>
+            </v-row>
+            <v-row no-gutters>
                 <v-col cols="12">
                     <v-slide-group multiple v-model="model2">
                         <v-slide-item
@@ -59,8 +63,8 @@
                             :key="n"
                             v-slot="{ active, toggle }"
                         >
-                            <v-col cols="1">
-                                <v-card class="" rounded="lg" elevation="0">
+                            <v-col>
+                                <v-card width="140" rounded="lg" elevation="0">
                                     <v-img
                                         src="../assets/2681826 1.png"
                                         class="rounded-lg"
