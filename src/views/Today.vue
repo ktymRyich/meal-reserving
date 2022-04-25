@@ -7,19 +7,17 @@
                     <p>This page is under development!</p>
                 </v-col>
             </v-row>
-            <v-row>
-                <UnderMenu />
-            </v-row>
+            <UnderMenu />
         </v-container>
     </div>
 </template>
 <script>
-// import UnderMenu from "@/components/UnderMenu.vue";
+import UnderMenu from "@/components/UnderMenu.vue";
 
 export default {
     name: "Home",
     components: {
-        // UnderMenu,
+        UnderMenu,
     },
     data: () => ({
         cards: [
