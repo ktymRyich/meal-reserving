@@ -94,7 +94,7 @@
                     @click="reserve()"
                 >
                     <v-expand-x-transition>
-                        <v-text v-show="!isChanged"> update changes </v-text>
+                        <div v-show="!isChanged">update changes</div>
                     </v-expand-x-transition>
                     <v-expand-x-transition>
                         <v-progress-circular
