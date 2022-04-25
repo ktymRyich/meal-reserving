@@ -2,7 +2,10 @@
     <div class="today">
         <v-container>
             <v-row>
-                <h1>This is a Today page</h1>
+                <v-col>
+                    <h1>This is a Today page</h1>
+                    <p>This page is under development!</p>
+                </v-col>
             </v-row>
             <v-row>
                 <UnderMenu />
