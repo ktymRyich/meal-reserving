@@ -112,7 +112,7 @@
 
             <v-row>
                 <v-col cols="12" class="mt-16">
-                    <h1 class="white">ここどうすっかな</h1>
+                    <h1 class="white">ココ見つけたら連絡してよ</h1>
                 </v-col>
             </v-row>
             <UnderMenu />
