@@ -1,7 +1,7 @@
 <template>
     <div class="status">
         <v-container fluid>
-            <v-row dense justify="space-between">
+            <v-row dense justify="space-between" class="mb-7">
                 <v-col cols="12" style="text-align: center">
                     <h1>Rserving status</h1>
                 </v-col>
@@ -73,37 +73,37 @@ export default {
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "4/28 Thu",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "4/29 Fri",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "4/30 Sut",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "5/1 Sun",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "5/2 Mon",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "5/3 Tus",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
             {
-                title: "4/27 Wed",
+                title: "5/4 Wed",
                 src: "https://cdn.vuetifyjs.com/images/cards/plane.jpg",
                 flex: 6,
             },
