@@ -111,7 +111,7 @@
             </v-fab-transition>
 
             <v-row>
-                <v-col cols="12" class="mt-16">
+                <v-col cols="12" class="mt-16" style="color: white">
                     <h1 class="white">ココ見つけたら連絡してよ</h1>
                 </v-col>
             </v-row>
