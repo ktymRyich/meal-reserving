@@ -12,7 +12,6 @@ import {
 } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getDatabase, child, ref, get } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -46,14 +45,6 @@ if (1 === auth) {
             user.getIdToken().then(() => {
                 console.log("The token was got");
             });
-            // user.providerData.forEach((profile) => {
-            //     console.log("Sign-in provider: " + profile.providerId);
-            //     console.log("  Provider-specific UID: " + profile.uid);
-            //     console.log("  Name: " + profile.displayName);
-            //     console.log("  Email: " + profile.email);
-            //     console.log("  Photo URL: " + profile.photoURL);
-            // });
-            // console.log("User Display Name : " + user.displayName);
         } else {
             console.log("Get auth");
             signInWithRedirect(auth, provider);
@@ -61,25 +52,25 @@ if (1 === auth) {
     });
 }
 
-// データベース取得
-const database = getDatabase();
-const dbRef = ref(database);
-// メニューの取得
-let menu;
-if (1 === menu) {
-    get(child(dbRef, `Menu/`))
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                menu = snapshot.val();
-                console.log(menu);
-            } else {
-                console.log("No data available");
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-}
+// // データベース取得
+// const database = getDatabase();
+// const dbRef = ref(database);
+// // メニューの取得
+// let menu;
+// if (1 === menu) {
+//     get(child(dbRef, `Menu/`))
+//         .then((snapshot) => {
+//             if (snapshot.exists()) {
+//                 menu = snapshot.val();
+//                 console.log(menu);
+//             } else {
+//                 console.log("No data available");
+//             }
+//         })
+//         .catch((error) => {
+//             console.error(error);
+//         });
+// }
 new Vue({
     router,
     vuetify,
