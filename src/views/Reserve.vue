@@ -14,10 +14,10 @@
             </v-row>
             <v-row no-gutters>
                 <v-col cols="12">
-                    <v-slide-group multiple v-model="model0">
+                    <v-slide-group multiple v-model="modelMorning">
                         <v-slide-item
                             v-for="meal in menuMorning"
-                            :key="meal.id"
+                            :key="meal.date"
                             v-slot="{ active, toggle }"
                         >
                             <v-col>
@@ -29,7 +29,12 @@
                                     ></v-img>
                                     <div class="my-2">
                                         <h4>{{ meal.mealName }}</h4>
-                                        4/22
+                                        {{
+                                            ((meal.date / 100).toFixed() %
+                                                100) +
+                                            "/" +
+                                            (meal.date % 100)
+                                        }}
                                     </div>
                                     <v-btn
                                         :input-value="active"
@@ -55,10 +60,10 @@
             </v-row>
             <v-row no-gutters>
                 <v-col cols="12">
-                    <v-slide-group multiple v-model="model1">
+                    <v-slide-group multiple v-model="modelNight">
                         <v-slide-item
                             v-for="meal in menuNight"
-                            :key="meal.id"
+                            :key="meal.date"
                             v-slot="{ active, toggle }"
                         >
                             <v-col>
@@ -67,7 +72,17 @@
                                         src="../assets/2681826 1.png"
                                         class="rounded-lg"
                                     ></v-img>
-                                    <h4 class="my-2">{{ meal.mealName }}</h4>
+                                    <div class="my-2">
+                                        <h4>
+                                            {{ meal.mealName }}
+                                        </h4>
+                                        {{
+                                            ((meal.date / 100).toFixed() %
+                                                100) +
+                                            "/" +
+                                            (meal.date % 100)
+                                        }}
+                                    </div>
                                     <v-btn
                                         :input-value="active"
                                         active-class="grey darken-4 white--text"
@@ -86,7 +101,8 @@
             </v-row>
 
             <!-- 更新ボタン -->
-            <v-fab-transition>
+            <!-- updateボタン -->
+            <v-expand-x-transition>
                 <v-btn
                     color="grey darken-4"
                     dark
@@ -94,21 +110,29 @@
                     right
                     bottom
                     class="mb-16"
-                    @click="reserve()"
-                    v-show="isChanged || updating"
+                    @click="updateReservation()"
+                    v-show="isChanged && !updating"
                 >
-                    <v-expand-x-transition>
-                        <div v-show="isChanged">update changes</div>
-                    </v-expand-x-transition>
-                    <v-expand-x-transition>
-                        <v-progress-circular
-                            indeterminate
-                            color="grey lighten-3"
-                            v-show="updating"
-                        ></v-progress-circular>
-                    </v-expand-x-transition>
+                    <div>update changes</div>
                 </v-btn>
-            </v-fab-transition>
+            </v-expand-x-transition>
+            <!-- 更新中ボタン -->
+            <v-expand-x-transition>
+                <v-btn
+                    color="grey darken-4"
+                    dark
+                    fixed
+                    right
+                    bottom
+                    class="mb-16"
+                    v-show="!isChanged && updating"
+                >
+                    <v-progress-circular
+                        indeterminate
+                        color="grey lighten-3"
+                    ></v-progress-circular>
+                </v-btn>
+            </v-expand-x-transition>
 
             <v-row>
                 <v-col cols="12" class="mt-16" style="color: white">
@@ -130,7 +154,7 @@ import {
     GoogleAuthProvider,
     onAuthStateChanged,
 } from "firebase/auth";
-import { getDatabase, ref, get, child, push } from "firebase/database";
+import { getDatabase, ref, get, child } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDtgBKlIY_tBn003irV44d9Qu54Kvt_dYo",
@@ -160,42 +184,88 @@ export default {
     },
     data: () => ({
         menuMorning: {
-            220516: { img: "test", mealName: "---" },
-            220517: { img: "test", mealName: "---" },
-            220518: { img: "test", mealName: "---" },
+            220516: { date: 220516, img: "test", mealName: "---" },
+            220517: { date: 220517, img: "test", mealName: "---" },
+            220518: { date: 220518, img: "test", mealName: "---" },
         },
         menuNight: {
-            1: { id: 2205090, img: "test", mealName: "---" },
-            2: { id: 2205091, img: "test", mealName: "---" },
-            3: { id: 2205100, img: "test", mealName: "---" },
+            220509: { date: 220509, img: "test", mealName: "---" },
+            220510: { date: 220510, img: "test", mealName: "---" },
+            220511: { date: 220511, img: "test", mealName: "---" },
         },
         isChanged: false,
         updating: false,
         res: "",
-        model0: null,
-        model1: null,
+        modelMorning: {},
+        modelNight: {},
+        reserving: { morning: {}, night: {} },
         uid: null,
+        today: null,
     }),
     methods: {
         reserve() {
+            // テストよう
             this.isChanged = false;
             this.updating = true;
         },
         updateReservation() {
-            push(ref(db, "Users/" + this.uid.reserving), {
-                2222220: true,
-            });
+            this.isChanged = false;
+            this.updating = true;
+
+            console.log(this.modelMorning);
+            console.log(this.modelNight);
+
+            this.reserving = {
+                morning: {},
+                night: {},
+            };
+            // if (Object.keys(this.modelMorning).length > 0)
+            for (let i = 0; i < Object.keys(this.modelMorning).length; i++) {
+                let date =
+                    "" +
+                    this.menuMorning[
+                        Object.keys(this.menuMorning)[this.modelMorning[i]]
+                    ].date;
+                this.reserving.morning[String(date)] = true;
+            }
+            for (let i = 0; i < Object.keys(this.modelNight).length; i++) {
+                let date =
+                    "" +
+                    this.menuNight[
+                        Object.keys(this.menuNight)[this.modelNight[i]]
+                    ].date;
+                this.reserving.night[String(date)] = true;
+            }
+            console.log(this.reserving);
+
+            // update(ref(db, "Users/" + this.uid + "/"), {
+            //     reserving: this.reserving,
+            // })
+            //     .then(() => {
+            //         this.updating = false;
+            //     })
+            //     .catch((err) => {
+            //         alert(err);
+            //     });
         },
     },
     watch: {
-        model0: function () {
+        modelMorning: function () {
             this.isChanged = true;
         },
-        model1: function () {
+        modelNight: function () {
             this.isChanged = true;
         },
     },
     created: function () {
+        // 今日の日付の取得
+        let d = new Date();
+        this.today =
+            "" +
+            d.getFullYear() +
+            ("00" + (d.getMonth + 1)).slice(-2) +
+            ("00" + d.getDate).slice(-2);
+
         // ユーザー認証処理
         onAuthStateChanged(auth, (user) => {
             if (!user) {
@@ -213,6 +283,7 @@ export default {
                 menu = snapshot.val();
                 console.log("Database get Success");
                 console.log(menu);
+                // vue内の変数に反映
                 this.menuMorning = menu.morning;
                 this.menuNight = menu.night;
             } else {
@@ -220,6 +291,8 @@ export default {
                 menu = {};
             }
         });
+
+        // 注文状況取得
     },
 };
 </script>
