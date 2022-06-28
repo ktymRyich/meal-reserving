@@ -16,8 +16,8 @@
                 <v-col cols="12">
                     <v-slide-group multiple v-model="modelMorning">
                         <v-slide-item
-                            v-for="meal in menuMorning"
-                            :key="meal.date"
+                            v-for="(meal, i) in menuMorning"
+                            :key="i"
                             v-slot="{ active, toggle }"
                         >
                             <v-col>
@@ -40,7 +40,10 @@
                                         :input-value="active"
                                         active-class="grey darken-4 white--text"
                                         depressed
-                                        @click="toggle"
+                                        @click="
+                                            toggle();
+                                            userChange(0);
+                                        "
                                     >
                                         {{
                                             active ? "Reserved" : "Reserve this"
@@ -87,7 +90,10 @@
                                         :input-value="active"
                                         active-class="grey darken-4 white--text"
                                         depressed
-                                        @click="toggle"
+                                        @click="
+                                            toggle();
+                                            userChange(1);
+                                        "
                                     >
                                         {{
                                             active ? "Reserved" : "Reserve this"
@@ -154,7 +160,7 @@ import {
     GoogleAuthProvider,
     onAuthStateChanged,
 } from "firebase/auth";
-import { getDatabase, ref, get, child } from "firebase/database";
+import { getDatabase, ref, get, child, update } from "firebase/database";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDtgBKlIY_tBn003irV44d9Qu54Kvt_dYo",
@@ -176,6 +182,15 @@ const provider = new GoogleAuthProvider();
 const db = getDatabase();
 const dbRef = ref(db);
 
+let getDateString = function (d) {
+    return (
+        "" +
+        d.getFullYear() +
+        ("00" + (d.getMonth() + 1)).slice(-2) +
+        ("00" + d.getDate()).slice(-2)
+    );
+};
+
 let menu;
 export default {
     name: "Home",
@@ -183,43 +198,45 @@ export default {
         UnderMenu,
     },
     data: () => ({
-        menuMorning: {
-            220516: { date: 220516, img: "test", mealName: "---" },
-            220517: { date: 220517, img: "test", mealName: "---" },
-            220518: { date: 220518, img: "test", mealName: "---" },
-        },
-        menuNight: {
-            220509: { date: 220509, img: "test", mealName: "---" },
-            220510: { date: 220510, img: "test", mealName: "---" },
-            220511: { date: 220511, img: "test", mealName: "---" },
-        },
+        menuMorning: {},
+        menuNight: {},
         isChanged: false,
         updating: false,
         res: "",
-        modelMorning: {},
-        modelNight: {},
+        modelMorning: [],
+        modelNight: [],
         reserving: { morning: {}, night: {} },
         uid: null,
         today: null,
+        loading: true,
+        asdf: 0,
     }),
     methods: {
-        reserve() {
-            // テストよう
-            this.isChanged = false;
-            this.updating = true;
+        abc() {
+            alert("abc");
         },
+        userChange(m) {
+            console.log(
+                "User changed the reserving states : " +
+                    (m === 0 ? "morning" : "night")
+            );
+            this.isChanged = true;
+        },
+        // ============================== 予約状況のアップロード ==============================
         updateReservation() {
+            // ボタンのモード変更
             this.isChanged = false;
             this.updating = true;
 
+            console.log("model morning: ");
             console.log(this.modelMorning);
-            console.log(this.modelNight);
+            console.log("model Night: ");
 
+            console.log(this.modelNight);
             this.reserving = {
                 morning: {},
                 night: {},
             };
-            // if (Object.keys(this.modelMorning).length > 0)
             for (let i = 0; i < Object.keys(this.modelMorning).length; i++) {
                 let date =
                     "" +
@@ -238,33 +255,62 @@ export default {
             }
             console.log(this.reserving);
 
-            // update(ref(db, "Users/" + this.uid + "/"), {
-            //     reserving: this.reserving,
-            // })
-            //     .then(() => {
-            //         this.updating = false;
-            //     })
-            //     .catch((err) => {
-            //         alert(err);
-            //     });
+            update(ref(db, "Users/" + this.uid + "/"), {
+                reserving: this.reserving,
+            })
+                .then(() => {
+                    this.updating = false;
+                })
+                .catch((err) => {
+                    alert(err);
+                });
+        },
+        // ============================== 注文状況取得 ==============================
+        getReservingState() {
+            let reservingUrl = `Users/` + this.uid + `/`;
+            get(child(dbRef, reservingUrl)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let me = snapshot.val();
+                    // vue内の変数に反映
+                    this.user = {
+                        name: me.name,
+                        roomNumber: me.roomNumber,
+                    };
+                    this.loading = true;
+                    for (let i = 0; i < 7; i++) {
+                        if (me.reserving.morning[this.getDate(i)] === true) {
+                            this.modelMorning.push(i);
+                        }
+                        if (me.reserving.night[this.getDate(i)] === true) {
+                            this.modelNight.push(i);
+                        }
+                    }
+                    this.loading = false;
+                } else {
+                    console.log("Getting user data error");
+                    this.user = {
+                        name: "取得失敗",
+                        roomNumber: "取得失敗",
+                    };
+                }
+            });
+        },
+        getDate(n) {
+            let d = new Date();
+            d.setDate(d.getDate() + n);
+            return getDateString(d);
         },
     },
     watch: {
-        modelMorning: function () {
-            this.isChanged = true;
-        },
-        modelNight: function () {
-            this.isChanged = true;
-        },
+        modelMorning: function () {},
+        modelNight: function () {},
     },
     created: function () {
         // 今日の日付の取得
         let d = new Date();
-        this.today =
-            "" +
-            d.getFullYear() +
-            ("00" + (d.getMonth + 1)).slice(-2) +
-            ("00" + d.getDate).slice(-2);
+        this.today = getDateString(d);
+
+        this.modelMorning = [];
 
         // ユーザー認証処理
         onAuthStateChanged(auth, (user) => {
@@ -272,7 +318,7 @@ export default {
                 signInWithRedirect(auth, provider);
             } else {
                 this.uid = user.uid;
-                console.log("uid: " + this.uid);
+                this.getReservingState();
             }
         });
     },
@@ -281,18 +327,48 @@ export default {
         get(child(dbRef, `Menu/`)).then((snapshot) => {
             if (snapshot.exists()) {
                 menu = snapshot.val();
-                console.log("Database get Success");
-                console.log(menu);
+
+                let day = new Date();
+                let m = {};
+                let n = {};
+                for (let i = 0; i < 7; i++) {
+                    let d = getDateString(day);
+                    // 朝ご飯のメニュー反映
+                    m[parseInt(d)] =
+                        parseInt(d) in menu.morning
+                            ? {
+                                  date: parseInt(d),
+                                  img: menu.morning[parseInt(d)].img,
+                                  mealName: menu.morning[parseInt(d)].mealName,
+                              }
+                            : {
+                                  date: parseInt(d),
+                                  img: 0,
+                                  mealName: "no info",
+                              };
+                    // 夜ご飯のメニュー反映
+                    n[parseInt(d)] =
+                        parseInt(d) in menu.night
+                            ? {
+                                  date: parseInt(d),
+                                  img: menu.night[parseInt(d)].img,
+                                  mealName: menu.night[parseInt(d)].mealName,
+                              }
+                            : {
+                                  date: parseInt(d),
+                                  img: 0,
+                                  mealName: "no info",
+                              };
+                    day.setDate(day.getDate() + 1);
+                }
                 // vue内の変数に反映
-                this.menuMorning = menu.morning;
-                this.menuNight = menu.night;
+                this.menuMorning = m;
+                this.menuNight = n;
             } else {
-                console.log("Database get errot");
+                console.log("Database get error @Menu");
                 menu = {};
             }
         });
-
-        // 注文状況取得
     },
 };
 </script>
