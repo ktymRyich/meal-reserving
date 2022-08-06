@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Reserve from "../views/Reserve.vue";
 import Today from "../views/Today.vue";
+import Editor from "../views/Editor.vue";
 
 Vue.use(VueRouter);
 
@@ -26,6 +27,11 @@ const routes = [
         path: "/today",
         name: "Today",
         component: Today,
+    },
+    {
+        path: "/editor",
+        name: "Editor",
+        component: Editor,
     },
 ];
 
