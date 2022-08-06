@@ -271,6 +271,7 @@ export default {
             get(child(dbRef, reservingUrl)).then((snapshot) => {
                 if (snapshot.exists()) {
                     let me = snapshot.val();
+                    console.log(me);
                     // vue内の変数に反映
                     this.user = {
                         name: me.name,
@@ -278,12 +279,15 @@ export default {
                     };
                     this.loading = true;
                     for (let i = 0; i < 7; i++) {
-                        if (me.reserving.morning[this.getDate(i)] === true) {
-                            this.modelMorning.push(i);
-                        }
-                        if (me.reserving.night[this.getDate(i)] === true) {
-                            this.modelNight.push(i);
-                        }
+                        let d = this.getDate(i);
+                        if (Object.keys(me.reserving).includes("morning"))
+                            if (me.reserving.morning[d] === true) {
+                                this.modelMorning.push(i);
+                            }
+                        if (Object.keys(me.reserving).includes("night"))
+                            if (me.reserving.night[d] === true) {
+                                this.modelNight.push(i);
+                            }
                     }
                     this.loading = false;
                 } else {
@@ -339,7 +343,7 @@ export default {
                             ? {
                                   date: parseInt(d),
                                   img: menu.morning[parseInt(d)].img,
-                                  mealName: menu.morning[parseInt(d)].mealName,
+                                  mealName: menu.morning[parseInt(d)].mealname,
                               }
                             : {
                                   date: parseInt(d),
@@ -352,7 +356,7 @@ export default {
                             ? {
                                   date: parseInt(d),
                                   img: menu.night[parseInt(d)].img,
-                                  mealName: menu.night[parseInt(d)].mealName,
+                                  mealName: menu.night[parseInt(d)].mealname,
                               }
                             : {
                                   date: parseInt(d),
