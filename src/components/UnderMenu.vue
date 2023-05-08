@@ -11,7 +11,7 @@
         </v-btn>
 
         <v-btn to="/today">
-            <!-- <span>Nearby</span> -->
+            <!-- <span> Nearby </span> -->
             <v-icon>mdi-account-group</v-icon>
         </v-btn>
     </v-bottom-navigation>
