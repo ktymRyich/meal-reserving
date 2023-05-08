@@ -9,6 +9,12 @@
 
             <v-row>
                 <v-col cols="12">
+                    <v-text-field
+                        label="Meal Name"
+                        placeholder="meal"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="12">
                     <v-file-input
                         accept="image/*"
                         label="Meal Image"
@@ -21,9 +27,6 @@
                         width="100%"
                         :src="mealData.img"
                     ></v-img>
-                </v-col>
-                <v-col cols="12">
-                    <h2>{{ mealData.name }}</h2>
                 </v-col>
             </v-row>
         </v-container>
@@ -80,20 +83,21 @@ export default {
     created: function () {},
     mounted: function () {
         // メニュー取得
-        let mealID = parseInt(this.$route.query.mealID);
-        let mealDay = Math.floor(mealID / 10);
-        let mealTime = mealID % 10 == 0 ? "morning" : "night";
-        let requestUrl = `Menu/` + mealTime + `/` + mealDay;
+        this.mealID = parseInt(this.$route.query.mealID);
+        this.mealDay = Math.floor(this.mealID / 10);
+        this.mealTime = this.mealID % 10 == 0 ? "morning" : "night";
+        this.requestUrl = `Menu/` + this.mealTime + `/` + this.mealDay;
+        this.mealType = this.mealID % 10 == 0 ? "morning" : "night";
 
         this.mealData.date =
-            String(parseInt(mealDay / 10000)) +
+            String(parseInt(this.mealDay / 10000)) +
             "." +
-            String(parseInt((mealDay % 10000) / 100)) +
+            String(parseInt((this.mealDay % 10000) / 100)) +
             "." +
-            String(parseInt(mealDay % 100));
+            String(parseInt(this.mealDay % 100));
 
-        console.log(requestUrl);
-        get(child(dbRef, requestUrl)).then((snapshot) => {
+        console.log(this.requestUrl);
+        get(child(dbRef, this.requestUrl)).then((snapshot) => {
             if (snapshot.exists()) {
                 let meal = snapshot.val();
                 this.mealData.name = meal.mealname;
@@ -101,7 +105,7 @@ export default {
                 console.log(meal);
             } else {
                 console.log("Not exist");
-                this.mealData.name = "inputhere";
+                this.mealData.name = "inputhere" + this.mealType;
                 this.mealData.img = "https://picsum.photos/id/11/10/6";
             }
         });
