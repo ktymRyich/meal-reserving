@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Reserve from "../views/Reserve.vue";
 import Today from "../views/Today.vue";
 import Editor from "../views/Editor.vue";
+import Meal from "../views/Meal.vue";
 
 Vue.use(VueRouter);
 
@@ -19,9 +20,9 @@ const routes = [
             import(/* webpackChunkName: "about" */ "../views/Status.vue"),
     },
     {
-        path: "/reserve",
-        name: "Reserve",
-        component: Reserve,
+        path: "/meal",
+        name: "Meal",
+        component: Meal,
     },
     {
         path: "/today",
