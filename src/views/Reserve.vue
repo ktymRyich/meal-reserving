@@ -271,7 +271,6 @@ export default {
             get(child(dbRef, reservingUrl)).then((snapshot) => {
                 if (snapshot.exists()) {
                     let me = snapshot.val();
-                    console.log(me);
                     // vue内の変数に反映
                     this.user = {
                         name: me.name,
@@ -279,13 +278,14 @@ export default {
                     };
                     this.loading = true;
                     for (let i = 0; i < 7; i++) {
-                        let d = this.getDate(i);
-                        if (Object.keys(me.reserving).includes("morning"))
-                            if (me.reserving.morning[d] === true) {
+                        if ("morning" in me.reserving)
+                            if (
+                                me.reserving.morning[this.getDate(i)] === true
+                            ) {
                                 this.modelMorning.push(i);
                             }
-                        if (Object.keys(me.reserving).includes("night"))
-                            if (me.reserving.night[d] === true) {
+                        if ("night" in me.reserving)
+                            if (me.reserving.night[this.getDate(i)] === true) {
                                 this.modelNight.push(i);
                             }
                     }
@@ -303,6 +303,28 @@ export default {
             let d = new Date();
             d.setDate(d.getDate() + n);
             return getDateString(d);
+        },
+        decodeMenu(menu) {
+            let m = {};
+            let day = new Date();
+            for (let i = 0; i < 7; i++) {
+                let d = getDateString(day);
+                // 朝ご飯のメニュー反映
+                m[parseInt(d)] =
+                    parseInt(d) in menu
+                        ? {
+                              date: parseInt(d),
+                              img: menu[parseInt(d)].img,
+                              mealName: menu[parseInt(d)].mealName,
+                          }
+                        : {
+                              date: parseInt(d),
+                              img: 0,
+                              mealName: "no info",
+                          };
+                day.setDate(day.getDate() + 1);
+            }
+            return m;
         },
     },
     watch: {
@@ -332,40 +354,9 @@ export default {
             if (snapshot.exists()) {
                 menu = snapshot.val();
 
-                let day = new Date();
-                let m = {};
-                let n = {};
-                for (let i = 0; i < 7; i++) {
-                    let d = getDateString(day);
-                    // 朝ご飯のメニュー反映
-                    m[parseInt(d)] =
-                        parseInt(d) in menu.morning
-                            ? {
-                                  date: parseInt(d),
-                                  img: menu.morning[parseInt(d)].img,
-                                  mealName: menu.morning[parseInt(d)].mealname,
-                              }
-                            : {
-                                  date: parseInt(d),
-                                  img: 0,
-                                  mealName: "no info",
-                              };
-                    // 夜ご飯のメニュー反映
-                    n[parseInt(d)] =
-                        parseInt(d) in menu.night
-                            ? {
-                                  date: parseInt(d),
-                                  img: menu.night[parseInt(d)].img,
-                                  mealName: menu.night[parseInt(d)].mealname,
-                              }
-                            : {
-                                  date: parseInt(d),
-                                  img: 0,
-                                  mealName: "no info",
-                              };
-                    day.setDate(day.getDate() + 1);
-                }
-                // vue内の変数に反映
+                // メニュー情報を vue に反映
+                let m = this.decodeMenu(menu.morning);
+                let n = this.decodeMenu(menu.night);
                 this.menuMorning = m;
                 this.menuNight = n;
             } else {
